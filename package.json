@@ -4,15 +4,27 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev":"npx tsx watch src/server.ts"
+    "dev": "npx tsx watch src/server.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ataides-Blume/movieflix-api.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Ataides-Blume/movieflix-api/issues"
+  },
+  "homepage": "https://github.com/Ataides-Blume/movieflix-api#readme",
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "prettier": "3.7.4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   }
 }

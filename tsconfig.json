@@ -9,11 +9,11 @@
     // See also https://aka.ms/tsconfig/module
     "module": "commonjs",
     "target": "es2019",
-    "types": ["node"],
+    
     // For nodejs:
     // "lib": ["esnext"],
-    
-    // "types": [], and npm install -D @types/node
+     "types": ["node"],
+    // and npm install -D @types/node
 
     // Other Outputs
     "sourceMap": true,
@@ -42,3 +42,4 @@
     "skipLibCheck": true,
   }
 }
+
