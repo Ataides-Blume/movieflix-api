@@ -15,7 +15,15 @@ const prisma = new PrismaClient({ adapter })
 export { prisma }
 
 app.get("/movies", async (req: Request, res: Response) => {
-    const movies = await prisma.movie.findMany()
+    const movies = await prisma.movie.findMany({
+        orderBy: {
+            title: 'asc'
+        },
+        include:{
+            genres: true,
+            languages: true,
+        }
+    })
     res.json(movies)
 })
 
