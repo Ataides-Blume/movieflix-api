@@ -32,7 +32,7 @@ app.get("/movies", async (req: Request, res: Response) => {
 app.post("/movies", async (req: Request, res: Response) => {
     const { title, genre_id, language_id, oscar_count, release_date } = req.body
     try {
-// Verificar no banco se já existe um filme com i nome que está sendo enviado
+        // Verificar no banco se já existe um filme com id nome que está sendo enviado
         const movieWithSameTitle = await prisma.movie.findFirst({
             where: {
                 title: {
@@ -43,7 +43,9 @@ app.post("/movies", async (req: Request, res: Response) => {
         })
 
         if (movieWithSameTitle) {
-            return res.status(409).send({ message: "Já existe um filme com esse nome" })
+            return res
+                .status(409)
+                .send({ message: "Já existe um filme com esse nome" })
         }
 
         await prisma.movie.create({
@@ -63,53 +65,78 @@ app.post("/movies", async (req: Request, res: Response) => {
 
 app.put("/movies/:id", async (req: Request, res: Response) => {
     // pegar o id do registro quer vai ser atualizado
-      const id = Number(req.params.id)
+    const id = Number(req.params.id)
 
-      try{
+    try {
+        const movie = await prisma.movie.findUnique({
+            where: {
+                id,
+            },
+        })
 
-      const movie = await prisma.movie.findUnique({
-        where: {
-            id
+        if (!movie) {
+            return res.status(404).send({ message: "Filme não encontrado" })
         }
-    })
 
-     if (!movie) {
-        return res.status(404).send({ message: "Filme não encontrado" })}
-    
-      const data ={...req.body}
-      data.release_date = data.release_date ? new Date(data.release_date) : undefined
-    // os dados do filme que será atualizado e atualizar ele no prisma
-      await prisma.movie.update({ 
-        where: {
-            id
-        },
-        data: data
-    })
-}catch(err) {
-    return res.status(500).send({ message: "Erro ao atualizar filme" })}
-// retornar o status correto informando que o filme foi atualizado
+        const data = { ...req.body }
+        data.release_date = data.release_date
+            ? new Date(data.release_date)
+            : undefined
+        // os dados do filme que será atualizado e atualizar ele no prisma
+        await prisma.movie.update({
+            where: {
+                id,
+            },
+            data: data,
+        })
+    } catch (err) {
+        return res.status(500).send({ message: "Erro ao atualizar filme" })
+    }
+    // retornar o status correto informando que o filme foi atualizado
     res.status(200).send()
 })
 
 app.delete("/movies/:id", async (req: Request, res: Response) => {
     const id = Number(req.params.id)
-try{
-const movie = await prisma.movie.findUnique({where: {id}
-})
+    try {
+        const movie = await prisma.movie.findUnique({ where: { id } })
 
-if(!movie){
-    return res.status(404).send({message: "Filme não encontrado"})
-}
+        if (!movie) {
+            return res.status(404).send({ message: "Filme não encontrado" })
+        }
 
-    await prisma.movie.delete({where: {id}})
-}catch(err){
-    return res.status(500).send({message: "Erro ao deletar filme"})
-}
+        await prisma.movie.delete({ where: { id } })
+    } catch (err) {
+        return res.status(500).send({ message: "Erro ao deletar filme" })
+    }
 
     res.status(200).send()
-
 })
 
+app.get("/movies/:genreName", async (req: Request, res: Response) => {
+    try {
+        const moviesFilteredByGenreName = await prisma.movie.findMany({
+            include: {
+                genres: true,
+                languages: true,
+            },
+
+            where: {
+                genres: {
+                    name: {
+                        equals: req.params.genreName!,
+                        mode: "insensitive",
+                    },
+                },
+            },
+        })
+        res.status(200).send(moviesFilteredByGenreName)
+    } catch (err) {
+        return res
+            .status(500)
+            .send({ message: "Erro ao filtrar filmes por gênero" })
+    }
+})
 
 app.listen(port, () => {
     console.log(`Servidor em execução na porta ${port}`)
