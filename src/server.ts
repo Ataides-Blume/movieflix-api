@@ -3,6 +3,8 @@ import type { Request, Response } from "express"
 import express from "express"
 import { PrismaPg } from "@prisma/adapter-pg"
 import { PrismaClient } from "./generated/prisma/client"
+import swaggerUi from "swagger-ui-express"
+import swaggerDocument from "../swagger.json"
 
 const port = 3000
 const app = express()
@@ -13,6 +15,7 @@ const adapter = new PrismaPg({ connectionString })
 const prisma = new PrismaClient({ adapter })
 
 app.use(express.json())
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
 export { prisma }
 
