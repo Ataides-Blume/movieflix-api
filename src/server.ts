@@ -92,9 +92,13 @@ app.put("/movies/:id", async (req: Request, res: Response) => {
             },
             data: data,
         })
-    } catch (err) {
-        return res.status(500).send({ message: "Erro ao atualizar filme" })
+    } catch (err: any) {
+        console.error(err)
+        return res.status(500).json({
+            message: "Erro ao atualizar filme, mensagem: " + err.message,
+        })
     }
+
     // retornar o status correto informando que o filme foi atualizado
     res.status(200).send()
 })
@@ -105,12 +109,12 @@ app.delete("/movies/:id", async (req: Request, res: Response) => {
         const movie = await prisma.movie.findUnique({ where: { id } })
 
         if (!movie) {
-            return res.status(404).send({ message: "Filme não encontrado" })
+            return res.status(404).send({ message: "O filme não foi encontrado" })
         }
 
         await prisma.movie.delete({ where: { id } })
     } catch (err) {
-        return res.status(500).send({ message: "Erro ao deletar filme" })
+        return res.status(500).send({ message: "Não foi possivel remover o filme" })
     }
 
     res.status(200).send()
